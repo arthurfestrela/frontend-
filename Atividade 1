@@ -1,0 +1,40 @@
+import time
+
+alturas = []
+generos = []
+
+for i in range (15):
+    altura = float(input(f"Digite a altura da {i+1}° pessoa (em metros): "))
+    genero = input(f'Digite o gênero da {i+1}° pessoa (utilize M para marculino e F para feminino): ')
+
+    alturas.append(altura)
+    generos.append(genero)
+
+maior = max(alturas)
+menor = min(alturas)
+
+soma_homens = 0
+quantidade_homens = 0
+for i in range (15):
+    if generos [i]== "M":
+        soma_homens += alturas[i]
+        quantidade_homens += 1
+
+if quantidade_homens > 0:
+    media_homens = soma_homens / quantidade_homens
+
+else:
+    media_homens = 0
+
+quantidade_mulheres = generos.count ("F")
+
+
+
+
+print("\n=== RESULTADOS ===")
+print(f"Maior altura do grupo: {maior:.2f} m")
+print(f"Menor altura do grupo: {menor:.2f} m")
+print(f"Média de altura dos homens: {media_homens:.2f} m")
+print(f"Número de mulheres: {quantidade_mulheres}")
+
+time.sleep(2)

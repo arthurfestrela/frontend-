@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Para Ana Julia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --rose:        #e8a4b8;
+      --rose-light:  #f5d0dc;
+      --lavender:    #c9b8e8;
+      --lavender-light: #e8e0f5;
+      --cream:       #fdf6f0;
+      --text-dark:   #3a2e3a;
+      --text-mid:    #6b5474;
+      --text-soft:   #9c849e;
+      --gold:        #d4af8a;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background-color: var(--cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ─── CANVAS DE PARTÍCULAS ─── */
+    #particles-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── SEÇÃO HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 30%, rgba(201, 184, 232, 0.35) 0%, transparent 60%),
+                  radial-gradient(ellipse at 30% 80%, rgba(232, 164, 184, 0.28) 0%, transparent 55%);
+      animation: gradientShift 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes gradientShift {
+      0%   { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1;   transform: scale(1.05); }
+    }
+
+    .hero-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.3s;
+    }
+
+    .hero-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 12vw, 7rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--text-dark);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.7s;
+    }
+
+    .hero-name span {
+      background: linear-gradient(135deg, var(--rose) 0%, var(--lavender) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 3.5vw, 1.35rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-mid);
+      margin-top: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.1s;
+    }
+
+    .hero-line {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--rose), transparent);
+      margin: 2.5rem auto;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 1.5s;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2.2s;
+    }
+
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .scroll-dot {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(180deg, var(--rose), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.15); }
+    }
+
+    /* ─── SEÇÕES COMPARTILHADAS ─── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 1.5rem;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── SEÇÃO DESCULPA ─── */
+    .apology {
+      background: transparent;
+    }
+
+    .apology-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(201, 184, 232, 0.25);
+      border-radius: 2px;
+      padding: 3.5rem 3rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .apology-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .apology-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-dark);
+      line-height: 1.25;
+      margin-bottom: 2rem;
+    }
+
+    .apology-title em {
+      color: var(--rose);
+      font-style: normal;
+    }
+
+    .apology-text {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.9;
+      color: var(--text-mid);
+    }
+
+    .apology-text p + p {
+      margin-top: 1.2rem;
+    }
+
+    /* ─── DIVISOR ORNAMENTAL ─── */
+    .ornament {
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .ornament-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .ornament-line::before,
+    .ornament-line::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--lavender));
+    }
+
+    .ornament-line::after {
+      background: linear-gradient(90deg, var(--lavender), transparent);
+    }
+
+    .ornament-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--lavender);
+    }
+
+    /* ─── SEÇÃO MÚSICA ─── */
+    .music-section {
+      background: linear-gradient(135deg, rgba(201,184,232,0.12) 0%, rgba(232,164,184,0.08) 100%);
+    }
+
+    .music-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    @media (max-width: 520px) {
+      .music-grid { grid-template-columns: 1fr; }
+    }
+
+    .music-card {
+      border: 1px solid rgba(201, 184, 232, 0.3);
+      border-radius: 2px;
+      padding: 2rem 1.5rem;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease, box-shadow 0.3s ease;
+    }
+
+    .music-card:nth-child(2) { transition-delay: 0.15s; }
+
+    .music-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .music-card:hover {
+      box-shadow: 0 8px 40px rgba(201, 184, 232, 0.25);
+    }
+
+    .music-card-icon {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 1.2rem;
+    }
+
+    .music-card-icon circle,
+    .music-card-icon path,
+    .music-card-icon rect,
+    .music-card-icon line,
+    .music-card-icon ellipse {
+      stroke: var(--lavender);
+    }
+
+    .music-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--text-dark);
+      margin-bottom: 0.6rem;
+    }
+
+    .music-card-text {
+      font-size: 0.875rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: var(--text-soft);
+    }
+
+    /* ─── SEÇÃO CONVITE ─── */
+    .invite-section {
+      text-align: center;
+    }
+
+    .invite-inner {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .invite-inner.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .invite-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 7vw, 3.2rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-dark);
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+
+    .invite-title strong {
+      font-weight: 500;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--lavender) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .invite-text {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--text-mid);
+      max-width: 520px;
+      margin: 0 auto 3rem;
+    }
+
+    .invite-cta {
+      display: inline-block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      color: var(--text-dark);
+      text-decoration: none;
+      border: 1px solid var(--rose);
+      padding: 1rem 2.8rem;
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.4s ease;
+      cursor: default;
+    }
+
+    .invite-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--rose-light), var(--lavender-light));
+      transform: translateX(-101%);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .invite-cta:hover::before {
+      transform: translateX(0);
+    }
+
+    .invite-cta span {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── DETALHES DO SUSHI ─── */
+    .sushi-details {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 3.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sushi-detail {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .sushi-detail:nth-child(2) { transition-delay: 0.15s; }
+    .sushi-detail:nth-child(3) { transition-delay: 0.3s; }
+
+    .sushi-detail.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .detail-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--text-dark);
+    }
+
+    /* ─── RODAPÉ ─── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+      border-top: 1px solid rgba(201, 184, 232, 0.2);
+    }
+
+    .footer-signature {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--text-soft);
+    }
+
+    .footer-heart {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin: 0 0.4rem;
+      vertical-align: middle;
+    }
+
+    /* ─── ANIMAÇÕES AUXILIARES ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── FITA DECORATIVA ─── */
+    .ribbon {
+      position: absolute;
+      top: 0; right: 0;
+      width: 160px;
+      height: 160px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .ribbon-inner {
+      position: absolute;
+      top: 34px;
+      right: -40px;
+      width: 170px;
+      text-align: center;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      background: linear-gradient(135deg, var(--rose) 0%, var(--lavender) 100%);
+      padding: 0.4rem 0;
+      transform: rotate(45deg);
+      font-family: 'Lato', sans-serif;
+    }
+
+    /* ─── RESPONSIVIDADE CARD ─── */
+    @media (max-width: 600px) {
+      .apology-card {
+        padding: 2.5rem 1.5rem;
+      }
+      .sushi-details {
+        gap: 2rem;
+      }
+    }
+
+    /* ─── BARRA DE PROGRESSO DE LEITURA ─── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--rose), var(--lavender));
+      width: 0%;
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progress-bar"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <p class="hero-badge">uma mensagem sincera</p>
+    <h1 class="hero-name">Ana<br /><span>Julia</span></h1>
+    <p class="hero-sub">preciso que você saiba o quanto me arrependo</p>
+    <div class="hero-line"></div>
+    <div class="scroll-hint">
+      <span>continuar</span>
+      <div class="scroll-dot"></div>
+    </div>
+  </section>
+
+  <!-- ─── DESCULPA ─── -->
+  <section class="apology">
+    <div class="container">
+      <div class="apology-card" data-reveal>
+        <div class="ribbon">
+          <div class="ribbon-inner">para voce</div>
+        </div>
+        <span class="section-label">o que preciso dizer</span>
+        <h2 class="apology-title">
+          Me arrependo de cada palavra<br />que <em>te magoou.</em>
+        </h2>
+        <div class="apology-text">
+          <p>
+            Ana Julia, sei que palavras sozinhas nao desfazem o que aconteceu,
+            mas preciso te dizer, com toda a honestidade que tenho, que me arrependo
+            profundamente de ter agido do jeito que agi.
+          </p>
+          <p>
+            Voce nao merecia isso. Nao merecia nenhuma das coisas ruins que surgiram
+            entre a gente. E entendo completamente se ainda esta magoada, porque voce
+            tem todo o direito de estar.
+          </p>
+          <p>
+            O que eu quero que fique guardado no seu coracao e que me importo com
+            voce de verdade. Que a sua presenca faz diferenca. E que errei, e que
+            assumo esse erro sem desculpa nenhuma.
+          </p>
+          <p>
+            Sinto muito. De verdade.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DIVISOR ─── -->
+  <div class="ornament">
+    <div class="ornament-line">
+      <div class="ornament-dot"></div>
+    </div>
+  </div>
+
+  <!-- ─── MUSICA ─── -->
+  <section class="music-section">
+    <div class="container">
+      <span class="section-label">o que nos conecta</span>
+      <div class="music-grid">
+
+        <div class="music-card" data-reveal>
+          <!-- ícone de nota musical -->
+          <svg class="music-card-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="10" cy="28" r="4" />
+            <circle cx="26" cy="24" r="4" />
+            <line x1="14" y1="28" x2="14" y2="8" />
+            <line x1="30" y1="24" x2="30" y2="6" />
+            <line x1="14" y1="8" x2="30" y2="6" />
+          </svg>
+          <h3 class="music-card-title">Justin Bieber</h3>
+          <p class="music-card-text">
+            Aquele jeito unico de colocar sentimento em cada musica.
+            As letras que falam de recomecos, de sorry, de dar uma segunda chance.
+            Talvez seja um sinal.
+          </p>
+        </div>
+
+        <div class="music-card" data-reveal>
+          <!-- ícone de estrela / violeta -->
+          <svg class="music-card-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 4 L21.5 13.5 L32 13.5 L23.5 19.5 L26.5 29 L18 23 L9.5 29 L12.5 19.5 L4 13.5 L14.5 13.5 Z" />
+          </svg>
+          <h3 class="music-card-title">Violeta</h3>
+          <p class="music-card-text">
+            Uma historia sobre encontrar a propria voz, sobre coragem de ser quem
+            voce e. Voce tem tudo isso. Uma forca que eu admiro, mesmo quando
+            eu nao soube demonstrar.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CONVITE ─── -->
+  <section class="invite-section">
+    <div class="container">
+      <div class="invite-inner" data-reveal>
+        <span class="section-label">um novo comeco</span>
+        <h2 class="invite-title">
+          E se a gente desse<br />uma <strong>nova chance</strong><br />pra nos?
+        </h2>
+        <p class="invite-text">
+          Nao preciso de nada grandioso. Quero apenas um domingo com voce,
+          uma mesa simples, sushi, e a chance de mostrar que sei fazer melhor.
+          De verdade, sem pressa, do jeito que voce merece.
+        </p>
+        <div class="invite-cta">
+          <span>domingo, eu convido</span>
+        </div>
+      </div>
+
+      <div class="sushi-details">
+        <div class="sushi-detail" data-reveal>
+          <p class="detail-label">dia</p>
+          <p class="detail-value">Domingo</p>
+        </div>
+        <div class="sushi-detail" data-reveal>
+          <p class="detail-label">o que</p>
+          <p class="detail-value">Sushi</p>
+        </div>
+        <div class="sushi-detail" data-reveal>
+          <p class="detail-label">com quem</p>
+          <p class="detail-value">So nos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── RODAPE ─── -->
+  <footer>
+    <p class="footer-signature">
+      feito com cuidado, para Ana Julia
+      <svg class="footer-heart" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 12.5S1 8.5 1 4.5A3.5 3.5 0 0 1 7 2.76 3.5 3.5 0 0 1 13 4.5C13 8.5 7 12.5 7 12.5Z"
+              fill="none" stroke="#e8a4b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </p>
+  </footer>
+
+  <script>
+    /* ─── BARRA DE PROGRESSO ─── */
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = (scrolled / total * 100) + '%';
+    });
+
+    /* ─── REVEAL ON SCROLL ─── */
+    const reveals = document.querySelectorAll('[data-reveal]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => observer.observe(el));
+
+    /* ─── PARTÍCULAS FLUTUANTES ─── */
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = document.documentElement.scrollHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const COLORS = [
+      'rgba(232, 164, 184, VAL)',
+      'rgba(201, 184, 232, VAL)',
+      'rgba(245, 208, 220, VAL)',
+      'rgba(212, 175, 138, VAL)',
+    ];
+
+    class Particle {
+      constructor() { this.reset(true); }
+      reset(initial) {
+        this.x = Math.random() * canvas.width;
+        this.y = initial ? Math.random() * canvas.height : canvas.height + 20;
+        this.r = Math.random() * 3 + 1;
+        this.speedY = -(Math.random() * 0.4 + 0.1);
+        this.speedX = (Math.random() - 0.5) * 0.2;
+        this.opacity = Math.random() * 0.5 + 0.1;
+        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        this.wobble = Math.random() * Math.PI * 2;
+        this.wobbleSpeed = Math.random() * 0.015 + 0.005;
+        this.life = 0;
+        this.maxLife = Math.random() * 400 + 200;
+      }
+      update() {
+        this.wobble += this.wobbleSpeed;
+        this.x += this.speedX + Math.sin(this.wobble) * 0.3;
+        this.y += this.speedY;
+        this.life++;
+        if (this.y < -20 || this.life > this.maxLife) this.reset(false);
+      }
+      draw() {
+        const col = this.color.replace('VAL', this.opacity);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = col;
+        ctx.fill();
+      }
+    }
+
+    const particles = Array.from({ length: 55 }, () => new Particle());
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>
